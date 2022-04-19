@@ -13,13 +13,16 @@ let nodeParent
 let totalPrice = 0
 let totalQuantity = 0
 
+//Affichage d'un message d'alerte au chargement de la page si le panier est vide ou inexistant
 document.onreadystatechange = function () {
-    if (document.readyState == 'complete' && cartArray.length == 0) {
+    if (document.readyState == 'complete' && (cartArray == undefined || cartArray.length == 0)) {
         alert("Votre panier est vide!\nVeuillez sélectionner vos articles et les ajouter au panier avant de remplir le formulaire pour transmettre votre commande.")
     }
 }
 
+//Affichage du panier
 for (let i in cartArray) {
+    //Requête sur l'API pour récupérer les informations de chaque produit du panier
     fetch("http://localhost:3000/api/products/" + cartArray[i]._id)
         //Si la requête aboutie, parser les données .json contenues dans le body de la réponse en objet JS
         .then(function (response) {
@@ -33,6 +36,7 @@ for (let i in cartArray) {
             cartArray[i].imageUrl = data.imageUrl
             cartArray[i].altTxt = data.altTxt
             viewCart(i)
+            //Calcul des totaux après l'affichage du dernier produit du panier
             if (i == cartArray.length - 1) {
                 updateTotalPriceAndQuantity()
             }
@@ -286,6 +290,7 @@ document.querySelector(".cart__order__form").addEventListener("submit", function
             //Réinitialiser le localStorage et rediriger l'utilisateur vers la page de confirmation
             .then(function (data) {
                 console.log(data.orderId)
+                localStorage.clear()
                 document.location.href = "confirmation.html?orderId=" + data.orderId
             })
             //En cas d'erreur, affichage du message correspondant dans la console

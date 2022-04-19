@@ -187,3 +187,52 @@ function viewCart(i) {
     createDiv("__delete")
     createParagraph(i, "Supprimer", "deleteItem")
 }
+
+
+//----- 2. Vérifier la validité des données renseignées dans le formulaire -----
+
+//Initialisation d'un objet stockant la valeur true/false de la validité de tous les champs du formulaire
+let results = {
+    firstName : false,
+    lastName : false,
+    address : false,
+    city : false,
+    email : false
+}
+
+//Vérification de la validité des données renseignées par application de regex
+function checkInput(element) {
+    let regex
+    element.onchange = function () {
+        //Différenciation des cas rencontrés dans les différents champs : regex différentes
+        switch (element) {
+            case firstName :
+            case lastName :
+                regex = /[A-ZÀ-Ÿa-z- ']$/
+                break
+            case address :
+            case city :
+                regex = /[0-9A-ZÀ-Ÿa-z-, ']$/
+                break
+            case email :
+                regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                break
+        }
+        //Stockage du résultat dans le tableau results
+        results[element.name] = regex.test(element.value)
+        //Affichage d'un message d'erreur si le test échoue
+        if (!results[element.name]) {
+            document.getElementById(element.id + "ErrorMsg").innerText = "Format invalide"
+        } else {
+            document.getElementById(element.id + "ErrorMsg").innerText = ""
+
+        }
+    }
+}
+
+//Application du test sur chacun des champs
+checkInput(firstName)
+checkInput(lastName)
+checkInput(address)
+checkInput(city)
+checkInput(email)

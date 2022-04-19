@@ -236,3 +236,67 @@ checkInput(lastName)
 checkInput(address)
 checkInput(city)
 checkInput(email)
+
+
+//----- 3. Commander -----
+
+//Créer un tableau avec les ids des produits commandés
+let listOfIds = []
+function createListOfIds() {
+    for (let i in cartArray) {
+        listOfIds.push(cartArray[i]._id)
+    }
+}
+
+//Rassembler les données à transmettre à l'API
+let orderInfos
+function createOrderInfos() {
+    orderInfos = {
+        contact: {
+            firstName: firstName.value,
+            lastName: lastName.value,
+            address: address.value,
+            city: city.value,
+            email: email.value
+        },
+        products: listOfIds
+    }
+}
+
+//Envoyer la commande à la soumission du formulaire
+document.querySelector(".cart__order__form").addEventListener("submit", function (event) {
+    event.preventDefault()
+    createListOfIds()
+    createOrderInfos()
+    console.log(orderInfos)
+    //Envoi des informations à l'API seulement si le panier n'est pas vide ET tous les champs du formulaire sont correctement renseignés
+    if (listOfIds != 0 && Object.values(results).every(value => value == true)) {
+        fetch("http://localhost:3000/api/products/order", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderInfos),
+        })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.json()
+                }
+            })
+            //Réinitialiser le localStorage et rediriger l'utilisateur vers la page de confirmation
+            .then(function (data) {
+                console.log(data.orderId)
+                document.location.href = "confirmation.html?orderId=" + data.orderId
+            })
+            //En cas d'erreur, affichage du message correspondant dans la console
+            .catch(function (err) {
+                console.log(err.message)
+            })
+    //Message à afficher si un ou plusieurs champs du formulaire n'est pas correct
+    } else if (!Object.values(results).every(value => value == true)) {
+        alert("Veuillez compléter et/ou vérifier les données du formulaire.")
+    //Message à afficher si le panier est toujours vide
+    } else if (listOfIds == 0) {
+        alert("Votre panier est vide!\nVeuillez sélectionner vos articles et les ajouter au panier avant de remplir le formulaire pour transmettre votre commande.")
+    }
+})

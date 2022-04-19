@@ -57,3 +57,67 @@ fetch("http://localhost:3000/api/products/")
     .catch(function(err){
         console.log(err.message)
     })
+
+
+//----- 2. Ajouter les articles au panier -----
+
+//Accès aux éléments HTML
+const btnAddToCart = document.getElementById("addToCart")
+
+//Déclaration des variables globales
+let selectedColor
+let selectedQuantity
+let selectedParameters
+let cartArray = []
+let foundIndex
+
+//Vérifier si un produit identique a déjà été ajouté au panier
+function productInCart () {
+    cartArray = JSON.parse(localStorage.cart)
+    foundIndex = cartArray.findIndex(element => element._id == idNumber && element.color == selectedColor)
+    return (foundIndex >= 0)
+}
+
+//Ajouter le produit au panier
+function addToCart() {
+    //Récupérer la couleur et la quantité sélectionnées
+    selectedColor = colors.value
+    selectedQuantity = parseInt(quantity.value)
+    //Si le panier est vide : ajouter le 1er objet
+    if (localStorage.length == 0) {
+        selectedParameters = {_id : idNumber, color : selectedColor, quantity : selectedQuantity}
+        cartArray.push(selectedParameters)
+    }
+    //Sinon, si le panier n'est pas vide et contient déjà un produit similaire : implémenter seulement la quantité
+    else if (localStorage.length != 0 && productInCart()) {
+        cartArray[foundIndex].quantity += selectedQuantity
+    }
+    //Sinon, si le panier n'est pas vide mais ne contient pas de produit similaire : récupérer le panier existant et ajouter un objet
+    else {
+        cartArray = JSON.parse(localStorage.cart)
+        selectedParameters = { _id : idNumber, color : selectedColor, quantity : selectedQuantity }
+        cartArray.push(selectedParameters)
+    }
+    //Mettre à jour le localStorage avec les nouvelles informations
+    localStorage.cart = JSON.stringify(cartArray)
+    console.log(localStorage)
+    alert("Vos articles ont bien été ajoutés au panier.")
+}
+
+
+//Au clic sur le boutton "Ajouter au panier" on vérifie que les options sont choisies puis on appelle la fonction addToCart
+btnAddToCart.addEventListener("click", function() {
+    if (colors.value == "" ) {
+        if (quantity.value == 0 ) {
+            alert("Veuillez sélectionner une couleur et un nombre d'article(s)")
+        } else {
+            alert("Veuillez sélectionner une couleur")
+        }
+    } else {
+        if (quantity.value == 0 ) {
+            alert("Veuillez sélectionner un nombre d'article(s)")
+        } else {
+            addToCart()
+        }
+    }
+})

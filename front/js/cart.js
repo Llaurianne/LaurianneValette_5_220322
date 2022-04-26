@@ -36,10 +36,8 @@ for (let i in cartArray) {
             cartArray[i].imageUrl = data.imageUrl
             cartArray[i].altTxt = data.altTxt
             viewCart(i)
-            //Calcul des totaux après l'affichage du dernier produit du panier
-            if (i == cartArray.length - 1) {
-                updateTotalPriceAndQuantity()
-            }
+            //Calcul des totaux prix et quantité
+            updateTotalPriceAndQuantity()
         })
         //En cas d'erreur, affichage du message correspondant dans la console
         .catch(function (err) {
